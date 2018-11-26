@@ -16,7 +16,7 @@ namespace cheatSheet
     public partial class Form1 : Form
     {
         private string directoryPath = "";
-        List<string> list;
+        List<Dictionary<string, string>> list;
         [DllImport("user32.dll")]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
         [DllImport("user32.dll")]
@@ -43,10 +43,10 @@ namespace cheatSheet
             using (StreamReader r = new StreamReader(directoryPath + "\\prueba.json"))
             {
                 var json = r.ReadToEnd();
-                list = JsonConvert.DeserializeObject<List<string>>(json);
-                foreach (string item in list)
+                list = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(json);
+                foreach (Dictionary<string, string> item in list)
                 {
-                    string[] row = new string[] { title, directoryPath, item };
+                    string[] row = new string[] { title, item["descripcion"], item["codigo"] };
                     dataGridView1.Rows.Add(row);
                 }
             }
