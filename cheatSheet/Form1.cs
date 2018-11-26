@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -13,6 +15,8 @@ namespace cheatSheet
 {
     public partial class Form1 : Form
     {
+        private string directoryPath = "";
+        List<string> list;
         [DllImport("user32.dll")]
         private static extern bool RegisterHotKey(IntPtr hWnd, int id, int fsModifiers, int vk);
         [DllImport("user32.dll")]
@@ -36,8 +40,16 @@ namespace cheatSheet
 
         public void populateGrid(String title)
         {
-            string[] row = new string[] { title, "DEvesh omar", "NOIDA" };
-            dataGridView1.Rows.Add(row);
+            using (StreamReader r = new StreamReader(directoryPath + "\\prueba.json"))
+            {
+                var json = r.ReadToEnd();
+                list = JsonConvert.DeserializeObject<List<string>>(json);
+                foreach (string item in list)
+                {
+                    string[] row = new string[] { title, directoryPath, item };
+                    dataGridView1.Rows.Add(row);
+                }
+            }
         }
 
         enum KeyModifier
@@ -55,6 +67,11 @@ namespace cheatSheet
             int id = 0;     // The id of the hotkey. 
             var HotKeyManager = new HotkeyManager(this);
             RegisterHotKey(HotKeyManager.Handle, id, (int)KeyModifier.Control, Keys.Space.GetHashCode());
+            directoryPath = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "\\.cheatSheet";
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
         }
 
         private void ExampleForm_FormClosing(object sender, FormClosingEventArgs e)
