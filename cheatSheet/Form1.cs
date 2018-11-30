@@ -40,15 +40,55 @@ namespace cheatSheet
 
         public void populateGrid(String title)
         {
-            using (StreamReader r = new StreamReader(directoryPath + "\\prueba.json"))
+            Console.WriteLine(title);
+            if (File.Exists(directoryPath + "\\" + title + ".json"))
+            {
+                using (StreamReader r = new StreamReader(directoryPath + "\\" + title + ".json"))
             {
                 var json = r.ReadToEnd();
                 list = JsonConvert.DeserializeObject<List<Dictionary<string, string>>>(json);
+                int col = 0;
+                int row = 0;
+                this.tableLayoutPanel1.Controls.Clear();
                 foreach (Dictionary<string, string> item in list)
                 {
-                    string[] row = new string[] { title, item["descripcion"], item["codigo"] };
-                    dataGridView1.Rows.Add(row);
+                    this.tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
+                    this.tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Absolute, 27F));
+                    Button newButton = new Button();
+                    newButton.FlatAppearance.BorderSize = 0;
+                    newButton.FlatStyle = FlatStyle.Flat;
+                    newButton.Font = new Font("Microsoft Sans Serif", 7.8F, FontStyle.Bold, GraphicsUnit.Point, ((byte)(0)));
+                    newButton.Size = new Size(131, 25);
+                    new ToolTip().SetToolTip(newButton, item["codigo"]);
+                    newButton.Text = item["codigo"];
+                    newButton.TextAlign = ContentAlignment.MiddleRight;
+                    newButton.UseVisualStyleBackColor = true;
+                    newButton.Click += new EventHandler(this.button1_Click);
+                    newButton.KeyUp += new KeyEventHandler(this.button1_KeyUp);
+                    this.tableLayoutPanel1.Controls.Add(newButton, col++, row);
+                    Label newLabel = new Label();
+                    newLabel.AutoSize = false;
+                    newLabel.Size = new Size(268, 27);
+                    string descripcion = item["descripcion"];
+                    new ToolTip().SetToolTip(newLabel, descripcion);
+                    if(descripcion.Length >= 33)
+                    {
+                        newLabel.Text = descripcion.Substring(0, 33);
+                    }
+                    else
+                    {
+                        newLabel.Text = descripcion;
+                    }
+                    
+                    newLabel.TextAlign = ContentAlignment.MiddleLeft;
+                    this.tableLayoutPanel1.Controls.Add(newLabel, col++, row);
+                    if (col == 5)
+                    {
+                        col = 0;
+                        row++;
+                    }
                 }
+            }
             }
         }
 
@@ -79,7 +119,17 @@ namespace cheatSheet
             UnregisterHotKey(this.Handle, 0);       // Unregister hotkey with id 0 before closing the form. You might want to call this more than once with different id values if you are planning to register more than one hotkey.
         }
 
-        private void dataGridView1_KeyUp(object sender, KeyEventArgs e)
+        private void Form1_KeyUp(object sender, KeyEventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetText((sender as Button).Text);
+        }
+
+        private void button1_KeyUp(object sender, KeyEventArgs e)
         {
             this.WindowState = FormWindowState.Minimized;
         }
